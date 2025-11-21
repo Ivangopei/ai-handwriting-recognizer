@@ -77,11 +77,11 @@ with col3:
     if canvas_result.image_data is not None:
         img_data = canvas_result.image_data.astype('uint8')
         
-        # --- SMART CENTERING LOGIC ---
+        # --- SMART PREPROCESSING (ASPECT RATIO PRESERVED) ---
         img = Image.fromarray(img_data).convert('L')
         img_array = np.array(img)
         
-        # Find the bounding box of the drawing
+        # 1. Find the bounding box
         rows = np.any(img_array, axis=1)
         cols = np.any(img_array, axis=0)
         
@@ -89,24 +89,40 @@ with col3:
             rmin, rmax = np.where(rows)[0][[0, -1]]
             cmin, cmax = np.where(cols)[0][[0, -1]]
             
-            # Crop to the content
+            # 2. Crop the image to the content
             img_array = img_array[rmin:rmax+1, cmin:cmax+1]
+            
+            # 3. Calculate Aspect Ratio
+            # We want to fit inside 20x20, but keep the shape!
+            h, w = img_array.shape
+            if h > w:
+                # If tall (like a 1), scale height to 20, width proportionally
+                factor = 20.0 / h
+            else:
+                # If wide, scale width to 20, height proportionally
+                factor = 20.0 / w
+            
+            new_h = int(h * factor)
+            new_w = int(w * factor)
+            
+            # Resize using the math above
             img = Image.fromarray(img_array)
+            img = img.resize((new_w, new_h))
             
-            # Resize to 20x20 (standard MNIST content size)
-            img = img.resize((20, 20))
-            
-            # Paste into center of 28x28 canvas
+            # 4. Paste into center of 28x28 canvas
             new_img = Image.new('L', (28, 28), 0)
-            # Center math: (28-20)/2 = 4
-            new_img.paste(img, (4, 4))
             
-            # Prepare for model
+            # Math to find the center
+            pad_left = int((28 - new_w) / 2)
+            pad_top = int((28 - new_h) / 2)
+            
+            new_img.paste(img, (pad_left, pad_top))
+            
+            # 5. Predict
             img_array = np.array(new_img)
             img_array = img_array / 255.0
             img_final = img_array.reshape(1, 28, 28, 1)
             
-            # Predict
             prediction = model.predict(img_final)
             guessed_number = np.argmax(prediction)
             confidence = np.max(prediction)
