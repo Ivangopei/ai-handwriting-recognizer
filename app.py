@@ -92,9 +92,46 @@ with col3:
     
     if canvas_result.image_data is not None:
         # Preprocessing
+        # ... (Start of processing block)
         img_data = canvas_result.image_data.astype('uint8')
+        
+        # Convert to grayscale
         img = Image.fromarray(img_data).convert('L')
-        img = img.resize((28, 28))
+        img_array = np.array(img)
+        
+        # --- SMART CROPPING LOGIC ---
+        # 1. Find the bounding box of the drawing (where is the user's ink?)
+        # We find all rows and columns that are NOT black
+        rows = np.any(img_array, axis=1)
+        cols = np.any(img_array, axis=0)
+        
+        if np.sum(rows) > 0: # Only if they drew something
+            rmin, rmax = np.where(rows)[0][[0, -1]]
+            cmin, cmax = np.where(cols)[0][[0, -1]]
+            
+            # Crop the image to just the number
+            img_array = img_array[rmin:rmax+1, cmin:cmax+1]
+            
+            # Convert back to PIL to resize nicely
+            img = Image.fromarray(img_array)
+            
+            # Resize to 20x20 (leaving 4px padding on all sides like MNIST)
+            img = img.resize((20, 20))
+            
+            # Create a blank 28x28 black canvas
+            new_img = Image.new('L', (28, 28), 0)
+            
+            # Paste the resized number into the center
+            new_img.paste(img, (4, 4))
+            
+            # Use this new centered image for prediction
+            img_array = np.array(new_img)
+            img_array = img_array / 255.0
+            img_final = img_array.reshape(1, 28, 28, 1)
+            
+            # ... (Continue with prediction as before)
+            prediction = model.predict(img_final)
+            # ...
         img_array = np.array(img)
         img_array = img_array / 255.0
         img_final = img_array.reshape(1, 28, 28, 1)
