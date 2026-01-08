@@ -34,7 +34,7 @@ def load_model():
 
 model = load_model()
 
-# --- SIDEBAR ---
+# SIDEBAR (INFO ABOUT ME)
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/4712/4712027.png", width=80)
     st.title("About the Engineer")
@@ -139,6 +139,7 @@ with col3:
             
         else:
             st.info("Waiting for input...")
+
 
 
 
