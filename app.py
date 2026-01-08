@@ -6,7 +6,7 @@ from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 import pandas as pd
 
-# --- PAGE CONFIGURATION ---
+# BROWSER TAB SETTINGS
 st.set_page_config(
     page_title = "Neural Digit Recognizer",
     page_icon = "🧠",
@@ -139,6 +139,7 @@ with col3:
             
         else:
             st.info("Waiting for input...")
+
 
 
 
