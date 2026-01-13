@@ -139,10 +139,3 @@ with col3:
             
         else:
             st.info("Waiting for input...")
-
-
-
-
-
-
-
