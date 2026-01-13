@@ -1,23 +1,17 @@
-# Ignore compiled bytecode that Python creates automatically
+# Environment
 __pycache__/
 *.py[cod]
-
-# These virtual environments will be ignored
 venv/
 .venv/
 env/
 .env
 
-# Ignore Streamlit local secrets/credentials
+# Project Specifics
 .streamlit/secrets.toml
-
-# Ignore local log files created during model training
 *.log
 
-# Personal IDE settings
+# IDE & OS Trash
 .vscode/
 .idea/
-
-# System specific files
 .DS_Store
 Thumbs.db
