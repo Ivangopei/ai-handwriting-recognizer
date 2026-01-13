@@ -1,5 +1,6 @@
-tensorflow-cpu
 streamlit
-streamlit-drawable-canvas
+tensorflow-cpu
 numpy
-pillow
+Pillow
+streamlit-drawable-canvas
+pandas
